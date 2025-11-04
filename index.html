@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prisoner's Dilemma Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Prisoner's Dilemma Simulation</h1>
+            <p>Explore how cooperation emerges from simple interaction rules</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Configuration Panel -->
+            <div class="config-panel">
+                <h2>Configuration</h2>
+                
+                <!-- Payoff Matrix -->
+                <div class="config-section">
+                    <h3>Payoff Matrix</h3>
+                    <div class="payoff-grid">
+                        <div class="payoff-item">
+                            <label for="payoff-t">T (Temptation):</label>
+                            <input type="number" id="payoff-t" value="5" min="0" step="0.5">
+                        </div>
+                        <div class="payoff-item">
+                            <label for="payoff-r">R (Reward):</label>
+                            <input type="number" id="payoff-r" value="3" min="0" step="0.5">
+                        </div>
+                        <div class="payoff-item">
+                            <label for="payoff-p">P (Punishment):</label>
+                            <input type="number" id="payoff-p" value="1" min="0" step="0.5">
+                        </div>
+                        <div class="payoff-item">
+                            <label for="payoff-s">S (Sucker):</label>
+                            <input type="number" id="payoff-s" value="0" min="0" step="0.5">
+                        </div>
+                    </div>
+                    <div class="payoff-explanation">
+                        <p><strong>Both Cooperate:</strong> R, R | <strong>Both Defect:</strong> P, P</p>
+                        <p><strong>One Defects:</strong> Defector gets T, Cooperator gets S</p>
+                    </div>
+                </div>
+
+                <!-- Game Settings -->
+                <div class="config-section">
+                    <h3>Game Settings</h3>
+                    <div class="setting-item">
+                        <label style="font-weight: bold;">Game Duration:</label>
+                        <div style="margin-left: 20px; margin-top: 8px;">
+                            <div style="margin-bottom: 8px;">
+                                <input type="radio" id="duration-fixed" name="game-duration" value="fixed" checked>
+                                <label for="duration-fixed">Fixed Round Number</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="duration-indefinite" name="game-duration" value="indefinite">
+                                <label for="duration-indefinite">Indefinite Horizon</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-item" id="fixed-rounds-section">
+                        <label for="num-rounds">Number of Rounds:</label>
+                        <input type="number" id="num-rounds" value="100" min="1" max="1000">
+                    </div>
+                    <div class="setting-item" id="indefinite-section" style="display: none;">
+                        <label for="continuation-prob">Continuation Probability (0.0 - 1.0):</label>
+                        <input type="number" id="continuation-prob" value="0.9" min="0" max="1" step="0.01">
+                        <small style="color: #6c757d; display: block; margin-top: 5px;">
+                            Probability that the game continues to the next round (e.g., 0.9 = 90% chance)
+                        </small>
+                    </div>
+                    <div class="setting-item">
+                        <label for="random-seed">Random Seed (for reproducibility):</label>
+                        <input type="number" id="random-seed" value="42" min="1">
+                    </div>
+                </div>
+
+                <!-- Tournament Mode -->
+                <div class="config-section">
+                    <h3>Tournament Mode</h3>
+                    <div class="setting-item">
+                        <input type="radio" id="mode-pairwise" name="tournament-mode" value="pairwise" checked>
+                        <label for="mode-pairwise">Pairwise (Select 2 strategies)</label>
+                    </div>
+                    <div class="setting-item">
+                        <input type="radio" id="mode-roundrobin" name="tournament-mode" value="roundrobin">
+                        <label for="mode-roundrobin">Round-Robin (All vs All)</label>
+                    </div>
+                </div>
+                
+                <!-- Generous TFT Parameters -->
+                <div class="config-section">
+                    <h3>Strategy Parameters</h3>
+                    <div class="setting-item">
+                        <label for="forgiveness-rate">Generous TFT Forgiveness Rate (0.0 - 1.0):</label>
+                        <input type="number" id="forgiveness-rate" value="0.1" min="0" max="1" step="0.05">
+                        <small style="color: #6c757d; display: block; margin-top: 5px;">
+                            Probability that Generous TFT forgives a defection (0.1 = 10%)
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Strategy Selection (for pairwise) -->
+                <div class="config-section" id="pairwise-section">
+                    <h3>Select Strategies</h3>
+                    <div class="setting-item">
+                        <label for="strategy1">Strategy 1:</label>
+                        <select id="strategy1">
+                            <option value="ALLC">Always Cooperate (ALL-C)</option>
+                            <option value="ALLD">Always Defect (ALL-D)</option>
+                            <option value="TFT" selected>Tit-for-Tat (TFT)</option>
+                            <option value="GRIM">Grim Trigger</option>
+                            <option value="GTFT">Generous TFT</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="strategy2">Strategy 2:</label>
+                        <select id="strategy2">
+                            <option value="ALLC">Always Cooperate (ALL-C)</option>
+                            <option value="ALLD" selected>Always Defect (ALL-D)</option>
+                            <option value="TFT">Tit-for-Tat (TFT)</option>
+                            <option value="GRIM">Grim Trigger</option>
+                            <option value="GTFT">Generous TFT</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Run Button -->
+                <button id="run-simulation" class="run-btn">Run Simulation</button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel">
+                <h2>Results</h2>
+                
+                <!-- Summary Stats -->
+                <div id="summary-stats" class="summary-stats">
+                    <p>Run a simulation to see results</p>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart-wrapper">
+                        <h3 id="cooperation-chart-title">Cooperation Rate</h3>
+                        <canvas id="cooperation-chart"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h3 id="payoff-chart-title">Payoffs</h3>
+                        <canvas id="payoff-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Payoff Matrix (Round-Robin only) -->
+                <div id="payoff-matrix-container" class="results-table-container" style="display: none;">
+                    <div id="payoff-matrix-table"></div>
+                </div>
+
+                <!-- Detailed Results Table -->
+                <div class="results-table-container">
+                    <h3>Detailed Results</h3>
+                    <div id="results-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="simulation.js"></script>
+    <script src="visualization.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
